@@ -26,7 +26,7 @@ export default function GameBoard({onSelectSquare, turns}){
 
     for(const turn of turns) {
        const { square, player } = turn;
-       const {row, col} = player;
+       const {row, col} = square;
 
        gameBoard[row][col] = player;
     }
