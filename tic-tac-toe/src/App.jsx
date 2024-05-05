@@ -3,6 +3,7 @@ import { useState } from 'react';
 import Player from "./components/Player.jsx"
 import GameBoard from "./components/GameBoard.jsx";
 import Log from "./components/Log.jsx"
+import GameOver from './components/GameOver.jsx';
 import { WINNING_COMBINATIONS } from "./winning-combinations.js";
 
 function obtainActivePlayer(gameTurns) {
@@ -28,7 +29,8 @@ function App() {
     //to avoid managing unnecessary states the information about the active place will be gotten through a helper function
     const activePlayer = obtainActivePlayer(gameTurns);
 
-    let gameBoard = initialGameBoard;
+    //to make possible that the initialGameBoard will be set to a null empty array when handleRestart is called, we need to create a deep copy of initialGameBoard
+    let gameBoard = [...initialGameBoard.map(array => [...array])];
 
     for(const turn of gameTurns) {
         const { square, player } = turn;
@@ -48,9 +50,12 @@ function App() {
         if(firstSquareSymbol &&
             firstSquareSymbol === secondSquareSymbol &&
             firstSquareSymbol === thirdSquareSymbol) {
+
             winner = firstSquareSymbol;
         }
     }
+
+    const hasDraw = gameTurns.length === 9 && !winner;
 
     function handleSelectSquare(rowIndex, colIndex) {
         //setActivePlayer((curActivePlayer)=> curActivePlayer === 'X' ? 'O' : 'X');
@@ -63,6 +68,10 @@ function App() {
         });
     }
 
+    function handleRestart() {
+      setGameTurns([]);
+    }
+
     return (
     <main>
       <div id="game-container">
@@ -70,7 +79,7 @@ function App() {
           <Player initialName="Player 1" symbol="X" isActive={activePlayer === 'X'}/>
           <Player initialName="Player 2" symbol="O" isActive={activePlayer === 'O'}/>
         </ol>
-          {winner && <p>You won, {winner}</p>}
+          {(winner || hasDraw) && <GameOver winner={winner} onRestart={handleRestart}/>}
         <GameBoard onSelectSquare={handleSelectSquare}
                    board={gameBoard}
         />
